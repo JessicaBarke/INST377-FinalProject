@@ -1,0 +1,80 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+header {
+    background: #4A90E2; /* Primary Blue */
+    color: #ffffff;
+    padding: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0 2rem;
+    font-size: 1.8rem;
+}
+
+nav {
+    margin: 0 2rem;
+    padding-top: 0.5rem;
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    margin-right: 1.5rem;
+    font-weight: bold;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+nav a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+main {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #ffffff;
+    min-height: 80vh;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+h2, h3 {
+    color: #3873B6; /* Darker Blue */
+    border-bottom: 2px solid #E0E0E0;
+    padding-bottom: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+#output {
+    background-color: #e9e9e9;
+    padding: 15px;
+    border: 1px solid #ccc;
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 0.9rem;
+    margin-top: 20px;
+}
+
+button {
+    background-color: #008CBA; /* Teal Blue */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #005f79;
+}

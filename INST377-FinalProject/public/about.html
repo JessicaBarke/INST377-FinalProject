@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About This Project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>🗓️ Scheduling Navigator</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="find_time.html">Find a Time</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+    <main>
+        <h2>About the INST377 Scheduling Navigator</h2>
+        <p>This application addresses the problem of **efficiently managing schedules and coordinating meetings** for students, professionals, and organizations.</p>
+        
+        <p>By integrating with the Google Calendar API, Nager.Date, and a custom Supabase backend, we provide a streamlined way to find optimal meeting times, avoiding conflicts and holidays.</p>
+        
+        <h3>Key APIs Leveraged:</h3>
+        <ul>
+            <li>**Google Calendar API:** For real-time event and availability data (`Events.list`, `FreeBusy.query`).</li>
+            <li>**Supabase Database (Custom API):** To save and retrieve user preferences and default settings.</li>
+            <li>**Nager.Date:** To filter out public holidays from availability calculations.</li>
+        </ul>
+    </main>
+</body>
+</html>
