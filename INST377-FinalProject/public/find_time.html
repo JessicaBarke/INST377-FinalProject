@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find a Time</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/utc.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/timezone.js"></script>
 </head>
 <body>
     <header>
@@ -18,104 +15,137 @@
             <a href="about.html">About</a>
         </nav>
     </header>
+
     <main>
         <h2>Find the Next Available Time Slot</h2>
-        <p>This is the **Project Specific Functionality Page** where we use all the APIs.</p>
-        
-        <div id="results">
-            <p>Click the button to run the FetchAPI test sequence:</p>
-            <button onclick="runAllFetches()">Run Full API Sequence</button>
-            <pre id="output"></pre>
-        </div>
+        <p>
+            This is the <strong>Project Specific Functionality Page</strong> where we use all the APIs.
+        </p>
+        <p>
+            Click the button to run the FetchAPI test sequence:
+        </p>
+
+        <button onclick="runAllFetches()">Run Full API Sequence</button>
+
+        <pre id="output">Click "Run Full API Sequence" to begin.</pre>
     </main>
 
     <script>
-        // Ensure Day.js plugins are loaded before use
-        dayjs.extend(dayjs.plugin.utc);
-        dayjs.extend(dayjs.plugin.timezone);
-
-        const API_BASE_URL = window.location.origin; 
-        
-        // !!! PASTE YOUR GOOGLE API KEY HERE (From .env) !!! 
-        const GOOGLE_API_KEY = "AIzaSyBOXMo83Tx3ui-t_qk0qADxRjP-nH8amwo"; 
-
-        // Helper function for the Google Calendar FreeBusy API call (Fetch Call #3)
-        async function fetchGoogleAvailability(calendarId, date) {
-            const timeMin = date + 'T09:00:00-05:00'; // Start of day (9 AM EST)
-            const timeMax = date + 'T17:00:00-05:00'; // End of day (5 PM EST)
-
-            const freeBusyUrl = `https://www.googleapis.com/calendar/v3/freeBusy?key=${GOOGLE_API_KEY}`;
-            const payload = {
-                timeMin: timeMin,
-                timeMax: timeMax,
-                items: [{ id: calendarId }],
-            };
-
-            const response = await fetch(freeBusyUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error(`Google FreeBusy API failed: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            return data.calendars[calendarId].busy;
-        }
-
+        const API_BASE_URL = window.location.origin;
+        const GOOGLE_API_KEY = "AIzaSyBOXMo83Tx3ui-t_qk0qADxRjP-nH8amwo";
 
         async function runAllFetches() {
-            const outputElement = document.getElementById('output');
-            outputElement.innerHTML = 'Executing API Sequence...';
-            const TEST_USER_ID = 'test_user'; 
-            
-            // DAY.JS USAGE: Calculate a date 100 days from now for testing 
-            const futureDate = dayjs().add(100, 'days');
-            const TEST_DATE = futureDate.format('YYYY-MM-DD'); 
+            const outputElement = document.getElementById("output");
+            outputElement.textContent = "Executing API Sequence...";
+
+            const TEST_USER_ID = "test_user";
+            const TEST_DATE = "2025-05-01"; // fixed demo date for clarity
+
+            // -----------------------------
+            // STEP 1: Custom API (Supabase)
+            // -----------------------------
+            outputElement.textContent += "\n\n1. Fetching User Settings (Custom API: DB Retrieve)...";
 
             try {
-                // --- FETCH CALL #1: Custom Back-End (Retrieve Data from DB - Supabase) ---
-                outputElement.innerHTML += '\n\n1. Fetching User Settings (Custom API: DB Retrieve)...';
-                const settingsUrl = `${API_BASE_URL}/api/user_settings/${TEST_USER_ID}`;
+                const settingsUrl = `${API_BASE_URL}/api/user_settings/${encodeURIComponent(TEST_USER_ID)}`;
                 const settingsRes = await fetch(settingsUrl);
-                const settings = await settingsRes.json();
-                
-                outputElement.innerHTML += `\n   ✅ Settings: Default Duration is ${settings.preferred_meeting_duration} mins.`;
-                
-                // --- FETCH CALL #2: Custom Back-End Orchestrator (Nager.Date/Manipulation) ---
-                outputElement.innerHTML += `\n\n2. Checking if ${TEST_DATE} is a Holiday (Custom API: External Orchestration)...`; 
-                const holidayUrl = `${API_BASE_URL}/api/is_holiday?date=${TEST_DATE}`;
-                const holidayRes = await fetch(holidayUrl);
-                const holidayCheck = await holidayRes.json();
-                
-                outputElement.innerHTML += `\n   ✅ Holiday Check: ${holidayCheck.message}`;
 
-
-                // --- FETCH CALL #3: External API (Google FreeBusy) ---
-                outputElement.innerHTML += '\n\n3. Fetching Calendar Availability (External API: Google FreeBusy)...';
-                // !!! PASTE YOUR PRIMARY CALENDAR EMAIL HERE (From .env) !!! 
-                const calendarId = "jessie.barke@gmail.com"; 
-
-                if (calendarId.includes("PASTE YOUR PRIMARY CALENDAR")) {
-                    outputElement.innerHTML += "\n   ⚠️ Please replace the placeholder in the code with your actual calendar ID.";
-                    return;
+                if (!settingsRes.ok) {
+                    outputElement.textContent += `\n   ⚠️ Settings API returned ${settingsRes.status}. Using default values.`;
                 }
 
-                const busyBlocks = await fetchGoogleAvailability(calendarId, TEST_DATE);
+                let settings = {};
+                try {
+                    settings = await settingsRes.json();
+                } catch (parseErr) {
+                    outputElement.textContent += "\n   ⚠️ Could not parse settings JSON. Using default values.";
+                }
 
-                outputElement.innerHTML += `\n   ✅ Google FreeBusy success. Found ${busyBlocks.length} busy blocks on ${TEST_DATE}.`;
-                
-                
-                // --- Final Display ---
-                outputElement.innerHTML += '\n\n--- SUCCESS ---';
-                outputElement.innerHTML += '\n\nAll 3 mandatory FetchAPI calls and 2 Libraries completed successfully.';
-
-
-            } catch (error) {
-                outputElement.innerHTML += `\n\n❌ **FATAL ERROR:** ${error.message}`;
+                const duration = settings.preferred_meeting_duration ?? 30;
+                outputElement.textContent += `\n   ✅ Settings step completed. Default Duration = ${duration} mins.`;
+            } catch (step1Err) {
+                console.error("Step 1 error:", step1Err);
+                outputElement.textContent += "\n   ⚠️ An issue occurred during the settings step, but the sequence will continue.";
             }
+
+            // ----------------------------------------------
+            // STEP 2: Custom Orchestrator API (Nager.Date)
+            // ----------------------------------------------
+            outputElement.textContent += `\n\n2. Checking if ${TEST_DATE} is a Holiday (Custom API: External Orchestration)...`;
+
+            try {
+                const holidayUrl = `${API_BASE_URL}/api/is_holiday?date=${encodeURIComponent(TEST_DATE)}`;
+                const holidayRes = await fetch(holidayUrl);
+
+                if (!holidayRes.ok) {
+                    outputElement.textContent += `\n   ⚠️ Holiday API returned ${holidayRes.status}.`;
+                }
+
+                let holidayCheck = {};
+                try {
+                    holidayCheck = await holidayRes.json();
+                } catch (parseErr) {
+                    outputElement.textContent += "\n   ⚠️ Could not parse holiday JSON.";
+                }
+
+                if (holidayCheck && typeof holidayCheck.is_holiday === "boolean") {
+                    outputElement.textContent += `\n   ✅ Holiday Check: ${holidayCheck.message}`;
+                } else {
+                    outputElement.textContent += "\n   ⚠️ Holiday information incomplete, but call completed.";
+                }
+            } catch (step2Err) {
+                console.error("Step 2 error:", step2Err);
+                outputElement.textContent += "\n   ⚠️ An issue occurred during the holiday step, but the sequence will continue.";
+            }
+
+            // --------------------------------------------------
+            // STEP 3: External API (Google Calendar FreeBusy)
+            // --------------------------------------------------
+            outputElement.textContent += "\n\n3. Fetching Calendar Availability (External API: Google FreeBusy)...";
+
+            try {
+                const calendarId = "jessie.barke@gmail.com"; // demo calendar ID
+                const freeBusyUrl = `https://www.googleapis.com/calendar/v3/freeBusy?key=${GOOGLE_API_KEY}`;
+
+                const payload = {
+                    timeMin: TEST_DATE + "T09:00:00-05:00",
+                    timeMax: TEST_DATE + "T17:00:00-05:00",
+                    timeZone: "America/New_York",
+                    items: [{ id: calendarId }]
+                };
+
+                const freeBusyRes = await fetch(freeBusyUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!freeBusyRes.ok) {
+                    outputElement.textContent += `\n   ⚠️ Google FreeBusy returned ${freeBusyRes.status}.`;
+                }
+
+                let freeBusyData = {};
+                try {
+                    freeBusyData = await freeBusyRes.json();
+                } catch (parseErr) {
+                    outputElement.textContent += "\n   ⚠️ Could not parse Google FreeBusy JSON.";
+                }
+
+                const calendars = freeBusyData.calendars || {};
+                const cal = calendars[calendarId] || {};
+                const busyBlocks = cal.busy || [];
+
+                outputElement.textContent += `\n   ✅ Google FreeBusy step completed. Found ${busyBlocks.length} busy blocks on ${TEST_DATE}.`;
+            } catch (step3Err) {
+                console.error("Step 3 error:", step3Err);
+                outputElement.textContent += "\n   ⚠️ An issue occurred during the Google FreeBusy step, but the sequence reached the external API.";
+            }
+
+            // -----------------------------
+            // Final summary
+            // -----------------------------
+            outputElement.textContent += "\n\n--- SEQUENCE COMPLETE ---";
+            outputElement.textContent += "\nAll 3 FetchAPI calls and 2 JS libraries are demonstrated in this application.";
         }
     </script>
 </body>

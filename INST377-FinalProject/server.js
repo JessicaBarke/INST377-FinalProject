@@ -118,14 +118,12 @@ app.get('/api/is_holiday', async (req, res) => {
 });
 
 
-// Local server listener
+// Local development server listener (always on when you run `node server.js`)
 const PORT = process.env.PORT || 3000;
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-    app.listen(PORT, () => {
-        // This is the successful message you look for
-        console.log(`Server running at http://localhost:${PORT}`);
-    });
-}
+
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
 
 // Export the app for Vercel to use as a serverless function
 export default app;

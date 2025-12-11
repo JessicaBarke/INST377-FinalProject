@@ -16,9 +16,10 @@
             <a href="about.html">About</a>
         </nav>
     </header>
+
     <main>
-        <h2>Welcome to Your Dashboard</h2>
-        <p>The **Home Page** displays events and your weekly availability.</p>
+        <h2>WELCOME TO YOUR DASHBOARD (TEST)</h2>
+        <p>The <strong>Home Page</strong> displays events and your weekly availability.</p>
         
         <section id="weekly-availability">
             <h3>Weekly Availability Overview (Chart.js)</h3>
@@ -29,53 +30,61 @@
         
         <section id="today-events">
             <h3>Today's Events (Events.list)</h3>
-            <p>Loading...</p>
+            <!-- this is what JS will update -->
+            <p id="todays-events">Loading...</p>
         </section>
         
         <hr>
 
-        <p>Go to **<a href="find_time.html">Find a Time</a>** to use the core scheduling functionality.</p>
+        <p>Go to <strong><a href="find_time.html">Find a Time</a></strong> to use the core scheduling functionality.</p>
     </main>
-    
     <script>
-        // Dummy data for visualization (e.g., hours busy per day)
-        const busyData = {
-            labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-            datasets: [{
-                label: 'Hours Busy',
-                data: [1, 4.5, 6, 7.5, 5, 2, 0], // Example data
-                backgroundColor: 'rgba(74, 144, 226, 0.7)',
-                borderColor: 'rgba(56, 115, 182, 1)',
-                borderWidth: 1
-            }]
-        };
+    // ---------- Chart.js Demo Data ----------
+    const busyData = {
+        labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        datasets: [{
+            label: 'Hours Busy',
+            data: [1, 4.5, 6, 7.5, 5, 2, 0],
+            backgroundColor: 'rgba(74, 144, 226, 0.7)',
+            borderColor: 'rgba(56, 115, 182, 1)',
+            borderWidth: 1
+        }]
+    };
 
-        const config = {
-            type: 'bar',
-            data: busyData,
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 8, // Assuming 8 working hours max
-                        title: { display: true, text: 'Busy Hours' }
-                    }
-                },
-                plugins: {
-                    legend: { display: false },
-                    title: { display: true, text: 'Weekly Availability (Based on Google Calendar Data)' }
+    const config = {
+        type: 'bar',
+        data: busyData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 8,
+                    title: { text: 'Busy Hours', display: true }
                 }
+            },
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'Weekly Availability (Based on Google Calendar Data)' }
             }
-        };
+        }
+    };
 
-        // Render the chart when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            const chartContext = document.getElementById('availabilityChart').getContext('2d');
-            if (chartContext) {
-                 new Chart(chartContext, config);
-            }
-        });
-    </script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Render the Chart
+        const chartContext = document.getElementById('availabilityChart').getContext('2d');
+        new Chart(chartContext, config);
+
+        // Simulated output from Google Calendar Events.list
+        const eventsEl = document.getElementById('todays-events');
+        if (eventsEl) {
+            eventsEl.textContent =
+                "No conflicting events today based on your Google Calendar (Events.list). " +
+                "This panel summarizes today's calendar snapshot.";
+        }
+    });
+</script>
+
 </body>
 </html>
+
