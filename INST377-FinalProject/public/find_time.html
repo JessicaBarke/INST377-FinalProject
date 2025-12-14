@@ -104,7 +104,7 @@
             outputElement.textContent += "\n\n3. Fetching Calendar Availability (External API: Google FreeBusy)...";
 
             try {
-                const calendarId = "jessie.barke@gmail.com"; // demo calendar ID
+                const calendarId = PRIMARY_CALENDAR_ID; // demo calendar ID
                 const freeBusyUrl = `https://www.googleapis.com/calendar/v3/freeBusy?key=${GOOGLE_API_KEY}`;
 
                 const payload = {
